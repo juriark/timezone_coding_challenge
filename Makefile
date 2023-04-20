@@ -9,3 +9,6 @@ run_service:
 lint_typecheck:
 	docker run -v ./src:/app/src ${IMAGE} pylint src/ &
 	docker run -v ./src:/app/src ${IMAGE} mypy src/
+
+shell:
+	docker run -it ${IMAGE} bash
