@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "timezones"
+version = "0.1.0"
+description = ""
+authors = ["Julia Sammer <juliasammer@gmx.at>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+geopandas = "^0.12.2"
+pylint = "^2.17.2"
+mypy = "^1.2.0"
+
+
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
