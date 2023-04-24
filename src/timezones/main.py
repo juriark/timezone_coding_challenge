@@ -1,24 +1,19 @@
 from fastapi import FastAPI
 
+from timezones import schema
 from timezones.database import TimezoneDB
-from timezones.db_schema import Timezones
+from timezones.models import Timezones
+import typing as t
 
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
+@app.get("/timezones", response_model=schema.TimezoneBase)  # does validation, filtering and provides schema in swagger
+def get_timezones() -> t.Dict[str, t.List[str]]:
     """
-    This is awesome
+    Deliver all available timezones
+    :return:  # TODO
     """
-    return {"Hello": "World"}
-
-
-@app.get("/timezones_tmp")
-def read_first_timezone():
     with TimezoneDB() as db:
-        timezones = db.session.query(Timezones).first()
-    return {"index": str(timezones.index),
-            "TZID": str(timezones.TZID),
-            "geometry": str(timezones.geometry),
-            }
+        timezones = db.get_distinct_timezones()
+    return {"TZID": timezones}

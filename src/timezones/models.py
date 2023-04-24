@@ -15,5 +15,3 @@ class Timezones(Base):
     index: Mapped[int] = mapped_column(Integer, primary_key=True)
     TZID: Mapped[str] = mapped_column(Text, nullable=False)
     geometry: Mapped[str] = mapped_column(Geometry, nullable=False)
-
-# TODO: add pydantic schema for fastapi schema validation

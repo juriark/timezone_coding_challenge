@@ -6,20 +6,20 @@ import geopandas
 from geoalchemy2 import Geometry
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.sql import text
 from sqlalchemy.orm import sessionmaker
 
 from timezones.constants import INPUT_FILE, Status, CONNECTION_STRING, TIMEZONE_TABLE_NAME
+from timezones import models
 
 _logger = logging.getLogger(__name__)
 
 engine = create_engine(CONNECTION_STRING, echo=True)
-Session = sessionmaker(engine)
+SessionLocal = sessionmaker(engine)
 
 
 class TimezoneDB:
     def __init__(self) -> None:
-        self.session = Session()
+        self.session = SessionLocal()
 
     def __enter__(self) -> "TimezoneDB":
         return self
@@ -69,6 +69,11 @@ class TimezoneDB:
         _logger.info("Successfully written to database.")
         return Status.SUCCESS
 
+    def get_distinct_timezones(self) -> t.List[str]:
+        timezones = self.session.query(models.Timezones.TZID).distinct().all()
+        result = [timezone[0] for timezone in timezones]
+        return result
+
 
 if __name__ == '__main__':
     # This script is being called when spinning up the docker network from `docker compose`, and effectively writes the
@@ -85,8 +90,7 @@ if __name__ == '__main__':
     while num_tries <= max_tries:
         try:
             with TimezoneDB() as db:
-                write_to_db_status = db.create_table_from_shapefile(
-                    rows=10)  # TODO: write sqlalchemy schema for timezones
+                write_to_db_status = db.create_table_from_shapefile()
                 break
         except OperationalError:
             if num_tries == max_tries:
