@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text
 from sqlalchemy.orm import sessionmaker
 
-from timezones.constants import INPUT_FILE, Status, CONNECTION_STRING
+from timezones.constants import INPUT_FILE, Status, CONNECTION_STRING, TIMEZONE_TABLE_NAME
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class TimezoneDB:
             self,
             file_path: Path = INPUT_FILE,
             rows: t.Optional[int] = None,
-            table_name: str = "timezones",
+            table_name: str = TIMEZONE_TABLE_NAME,
             schema: t.Optional[None] = None,
     ) -> Status:
         """
@@ -60,7 +60,7 @@ class TimezoneDB:
 
         # Write to database
         try:
-            gdf.to_postgis(name=table_name, con=self._get_engine(), schema=schema,
+            gdf.to_postgis(name=table_name, con=self._get_engine(), schema=schema, index=True,
                            dtype={'geometry': Geometry('POLYGON', srid=4326)})
         except ValueError as error:
             _logger.error(f"Failed to write dataframe to database: {error}")
