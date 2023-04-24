@@ -16,8 +16,7 @@ COPY ./pyproject.toml ./poetry.lock* ./
 RUN poetry install
 
 COPY ./src ./src
-COPY ./data/world/tz_world.shp ./data/world/tz_world.shp
+COPY ./data/world ./data/world
 
-#CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 WORKDIR /opt/project/src
-CMD ["python3", "timezones/tmp.py"]
+#CMD ["python3", "timezones/tmp.py"]

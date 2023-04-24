@@ -1,12 +1,10 @@
-version: "3.8"
+version: "3"
 
 services:
   db:
-    container_name: postgres
-    image: "postgres:alpine3.17"
+    image: "postgis/postgis:15-3.3"
+    restart: "always"
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
@@ -24,7 +22,10 @@ services:
       - db
     volumes:
       - "./:/app"
-    command: "uvicorn src.timezones.main:app --host 0.0.0.0 --port 8000"
+    command: bash -c "
+      python3 timezones/database.py &&
+      uvicorn src.timezones.main:app --host 0.0.0.0 --port 8000
+      "
 
 volumes:
   db:
