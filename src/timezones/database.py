@@ -4,7 +4,7 @@ import typing as t
 
 import geopandas
 from geoalchemy2 import Geometry
-from sqlalchemy import create_engine, Engine, text
+from sqlalchemy import create_engine, Engine, text, Connection
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
@@ -27,7 +27,7 @@ class TimezoneDB:
     def __exit__(self, *args: t.Any) -> None:
         self.session.close()
 
-    def _get_engine(self) -> Engine:
+    def _get_engine(self) -> t.Union[Engine, Connection]:
         """Get sqlachemy engine object from current session"""
         return self.session.get_bind()
 
@@ -80,7 +80,7 @@ class TimezoneDB:
         location = f'SRID=4326;POINT({lon:.5f} {lat:.5f})'
         result = self.session.query(models.Timezones.TZID).filter(
             models.Timezones.geometry.ST_Intersects(location)).first()
-        return result
+        return result  # type: ignore
 
 
 if __name__ == '__main__':
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     # Might run into race condition for first container spinup.
     num_tries = 0
-    max_tries = 4
+    max_tries = 10
     while num_tries <= max_tries:
         try:
             with TimezoneDB() as db:
@@ -105,4 +105,4 @@ if __name__ == '__main__':
                 _logger.error("Cannot connect to database - number of tries exceeded")
                 raise
             num_tries += 1
-            sleep(5)
+            sleep(3)
