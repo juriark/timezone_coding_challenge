@@ -4,7 +4,7 @@ import typing as t
 
 import geopandas
 from geoalchemy2 import Geometry
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine, Engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
@@ -70,8 +70,16 @@ class TimezoneDB:
         return Status.SUCCESS
 
     def get_distinct_timezones(self) -> t.List[str]:
+        """Get all timezones from database."""
         timezones = self.session.query(models.Timezones.TZID).distinct().all()
         result = [timezone[0] for timezone in timezones]
+        return result
+
+    def get_timezone_for_location(self, lat: float, lon: float) -> t.Optional[t.List[str]]:
+        """Get the timezone for the location specified by lat and lon."""
+        location = f'SRID=4326;POINT({lon:.5f} {lat:.5f})'
+        result = self.session.query(models.Timezones.TZID).filter(
+            models.Timezones.geometry.ST_Intersects(location)).first()
         return result
 
 
