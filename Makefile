@@ -12,3 +12,7 @@ lint_typecheck:
 
 shell:
 	docker run -it ${IMAGE} bash
+
+
+test:
+	docker run -v .:/app ${IMAGE} pytest /app/tests

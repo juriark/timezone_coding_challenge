@@ -1,7 +1,8 @@
 # Timezone Coding Challenge
 
 ## Problem Definition
-Create a microservice that has the following endpoint  
+
+Create a microservice that has the following endpoint
 
 ```
 /timezones
@@ -11,27 +12,31 @@ Create a microservice that has the following endpoint
 ```
 
 As a data source the timezone world shapefile from http://efele.net/maps/tz/world/ should be used.
-The endpoint shall return a meaningful timezones for uninhabited zones.  
+The endpoint shall return a meaningful timezones for uninhabited zones.
 
 The microservice shall be developed in python and be install/runnable on Ubuntu.
 You can use any frameworks/libraries you desire
 
-## Documentation
-### Stack
+## Setup
+
+### Prerequisites
+
+- Have `docker compose` installed, see https://docs.docker.com/compose/install/linux/
+
+### Run the service
+
+- From the project's root directory, run `docker compose build`. This will download the postgis base image, and build
+  a custom image from the `Dockerfile`.
+- To spinup the containers, run `docker compose up`, which will start a docker network running a postgres/postgis
+  container and a container hosting the API. This might take some time, because the inital spinup will write the data
+  from `./data/world` to the database.
+- Once the uvicorn server is available, visit the interactive API documentation at [http://0.0.0.0:8000/docs]()
+
+## Stack
+
 - `poetry`: dependency management of third party libraries
-
-### Notes
-The shapefile does not contain neither territorial seas nor oceans - clarify if these shall be reconstructed or not.
-
-Both the database as well as the API are containerized together. For scalability it might make sense to build separate
-containers that can easily be deployed separately. I will refrain from doing it here though, because I don't know if the
-`docker compose` plugin is installed on the Ubuntu machine this code will run on.
-
-
-## Keep in mind:
-- write tests
-- do linting, use types
-
-
-## Questions
-- The shapefile does not contain neither territorial seas nor oceans. Shall these be constructed? If yes, how shall they be reconstructed (e.g. longitude)
+- `fastapi`, `uvicorn`: API development
+- `geopandas`: writing vectordata to postgis database
+- `sqlalchemy`, `geoalchemy2`: ORM
+- `pytest`: unit testing
+- `mypy`, `pylint`: type annotations and linting
